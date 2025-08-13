@@ -7,7 +7,7 @@ export class User{
     @PrimaryGeneratedColumn()
     PK: number;
 
-    @Column()
+    @Column({unique:true})
     user_id: number;
 
     @Column()
@@ -18,6 +18,12 @@ export class User{
 
     @Column()
     seller: boolean;
+
+    @Column({nullable:false})
+    refreshtoken:string;
+
+    @Column({type:'timestamp'})
+    refreshtokenExp: Date;
 
     @OneToMany(()=>Product,(product)=>product.user,{
         cascade:true,

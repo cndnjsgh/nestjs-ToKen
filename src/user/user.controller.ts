@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Query, Req, Res, UnauthorizedException, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Header, Headers, Post, Query, Req, Res, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserRegisterRequestDto } from 'src/User.DTO/userregister.request';
 import { UserRegisterResqonesDto } from 'src/User.DTO/userregister.respones';
@@ -6,9 +6,10 @@ import { UserListResponesDto } from 'src/User.DTO/userlist.respones';
 import { UserFindResponesDto } from 'src/User.DTO/userfind.respones';
 import { UserDeleteRespones } from 'src/User.DTO/userdeleterespones';
 import { UserDeleteRequestDto } from 'src/User.DTO/userdeleterequest';
-import { UserDto } from 'src/User.DTO/logindto';
+import { LoginDto } from 'src/User.DTO/logindto';
 import { Request, Response } from 'express';
 import { UserGuard } from 'src/security/user.guard';
+import { TokenRes } from 'src/User.DTO/token.respones';
 
 @Controller('user')
 export class UserController {
@@ -23,20 +24,19 @@ export class UserController {
     }
 
     @Post('login')
-    async Login(@Body() userDTO:UserDto, @Res() res: Response):Promise<any>{
-        const jwt = await this.userService.Login(userDTO);
-        if(!jwt){
-            throw new UnauthorizedException();
-        }
-        res.setHeader('Authorization', 'Bearer ' + jwt.accessToKen);
-        return res.json(jwt);
+    async Login(@Body() body:LoginDto):Promise<TokenRes>{
+        return this.userService.Login(body);
     }
 
-    @Get('/authenticate')
+    @Get('accesstoken')
+    async GetAccessToken(@Headers('chu') chu:string){
+        return this.userService.GetAccessToken(chu);
+    }
+
+    @Get('get_name')
     @UseGuards(UserGuard)
-    isAuthenticated(@Req() req: Request): any { 
-    const user: any = req.user;
-    return user;
+    async getName(@Headers('chu') chu:string){
+        return this.userService.GetName(chu);
     }
 
     @Get('userlist')
